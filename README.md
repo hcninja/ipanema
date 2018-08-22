@@ -1,3 +1,3 @@
 # ipanema
 
-Ipanema is a tool for pentesting iOS ipa bundled applications.
+Ipanema is a tool for iOS ipa application security assessment.
