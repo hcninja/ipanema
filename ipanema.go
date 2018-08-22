@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	// https://godoc.org/github.com/DHowett/go-plist
 )
@@ -34,16 +34,26 @@ var (
 	ipaFlag string
 )
 
+var log = logrus.New()
+
 func init() {
+	// log.SetLevel(log.DebugLevel)
+	// log.SetOutput(os.Stderr)
+	// log.SetFormatter(&prefixed.TextFormatter{})
+	formatter := &prefixed.TextFormatter{
+		FullTimestamp: true,
+	}
+
+	log.Formatter = formatter
+	log.Level = logrus.DebugLevel
+	log.SetOutput(os.Stdout)
+
 	flag.StringVar(&ipaFlag, "ipa", "", "Select the ipa to analyze")
 	flag.Parse()
+
 }
 
 func main() {
-	log.SetLevel(log.DebugLevel)
-	log.SetOutput(os.Stderr)
-	log.SetFormatter(&prefixed.TextFormatter{})
-
 	log.Debugf("Starting ipanema v%s", VERSION)
 
 	if ipaFlag == "" {

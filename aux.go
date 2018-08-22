@@ -24,8 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	log "github.com/Sirupsen/logrus"
+	// log "github.com/sirupsen/logrus"
 )
 
 // Unzip will decompress a zip archive, moving all files and folders

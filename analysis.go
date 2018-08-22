@@ -30,7 +30,7 @@ import (
 	"strings"
 
 	plist "github.com/DHowett/go-plist"
-	log "github.com/Sirupsen/logrus"
+	// log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -247,6 +247,7 @@ func (ar *AnalysisResult) PathDiscover() {
 
 // EggHunter searches for tokens, urls, usernames, passwords…
 // TODO: Search inside nib files
+// TODO: Set regexes on map and iterate
 func (ar *AnalysisResult) EggHunter() {
 	ar.WorthyEggs = map[string][]string{}
 
