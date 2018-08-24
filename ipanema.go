@@ -18,6 +18,10 @@ package main
 
 import (
 	"flag"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"os"
