@@ -18,11 +18,11 @@ package main
 
 import (
 	"flag"
-	"os"
-	"strings"
-
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+	"os"
+	"path/filepath"
+	"strings"
 	// https://godoc.org/github.com/DHowett/go-plist
 )
 
@@ -71,14 +71,14 @@ func main() {
 
 	ar.HashCalculator(ipaFlag)
 
-	ar.ProjDir = os.TempDir() + strings.Replace(ar.FileName, ".", "_", -1)
+	ar.ProjDir = filepath.Join(os.TempDir(), strings.Replace(ar.FileName, ".", "_", -1))
 
 	log.Debugf("Using the temporary folder: %s", ar.ProjDir)
 	ar.AppFiles, err = Unzip(ipaFlag, ar.ProjDir)
 	checkError(err)
 
 	// foo := strings.Split(ar.AppFiles[1], "/")[1]
-	ar.AppContainer = strings.Split(ar.AppFiles[1], "/")[1]
+	ar.AppContainer = FindAppContainer(ar.AppFiles)
 	log.Debugf("App container: %s", ar.AppContainer)
 
 	ar.NumberOfFiles = len(ar.AppFiles)
