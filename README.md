@@ -15,7 +15,7 @@ If this doesn't work, go to the project folder and do a `go get -u` before `go i
 
 ## Usage
 
-The usage is easy, `ipanema -ipa my.ipa`, the analysis will output some useful info to stdout, and after the analysis finishes you will find all the analysis data in the temporal path created by ipanema under the folder `analysisResult`. This folder will contain multiple txt files with the data specified in the filename, useful to grep for info, aside of this the whole analysis will be dumped in an `analysis.json` file, try to use `jq` for filter and search through the info.
+The usage is easy, `ipanema -ipa my.ipa`, the analysis will output some useful info to stdout, and after the analysis finishes you will find all the analysis data in the temporal path created by ipanema under the folder `analysisResult`. This folder will contain multiple txt files with the data specified in the filename, useful to grep for info, aside of this, the whole analysis will be dumped in an `analysis.json` file, try to use `jq` to filter and search through the info.
 
 ## TODO
 
