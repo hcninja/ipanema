@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -71,7 +72,7 @@ func main() {
 
 	ar.HashCalculator(ipaFlag)
 
-	ar.ProjDir = os.TempDir() + strings.Replace(ar.FileName, ".", "_", -1)
+	ar.ProjDir = filepath.Join(os.TempDir(), strings.Replace(ar.FileName, ".", "_", -1))
 
 	log.Debugf("Using the temporary folder: %s", ar.ProjDir)
 	ar.AppFiles, err = Unzip(ipaFlag, ar.ProjDir)

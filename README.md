@@ -26,7 +26,7 @@ The usage is easy, `ipanema -ipa my.ipa`, the analysis will output some useful i
 * [x] Search for valuable information available in the ipa bundle
 * [ ] Automated analysis with recommendations
 * [ ] Banned function analysis with an "exploitability" index
-* [ ] Web GUI
 * [ ] API
+* [ ] Web GUI
 * [ ] Sandbox to do a dynamic analysis
 * [ ] Function, methods and API fuzzing
