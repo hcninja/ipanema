@@ -78,6 +78,21 @@ type AnalysisResult struct {
 	WorthyEggs          map[string][]string // Saves file name and its interesting info
 }
 
+var eggs = map[string]*regexp.Regexp{
+	"URL":           regexp.MustCompile(`(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?`),
+	"IPAddress":     regexp.MustCompile(`^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$`),
+	"GoogleAPI":     regexp.MustCompile(`\W(AIza.{35})`),
+	"EmailAddress":  regexp.MustCompile(`[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})`),
+	"AWS":           regexp.MustCompile(`AKIA[0-9A-Z]{16}`),
+	"GitHub":        regexp.MustCompile(`[g|G][i|I][t|T][h|H][u|U][b|B].*[['|\"]0-9a-zA-Z]{35,40}['|\"]`),
+	"GoogleOAuth":   regexp.MustCompile(`(\"client_secret\":\"[a-zA-Z0-9-_]{24}\")`),
+	"TwitterOAuth":  regexp.MustCompile(`[t|T][w|W][i|I][t|T][t|T][e|E][r|R].*['|\"][0-9a-zA-Z]{35,44}['|\"]`),
+	"FacebookOAuth": regexp.MustCompile(`[f|F][a|A][c|C][e|E][b|B][o|O][o|O][k|K].*['|\"][0-9a-f]{32}['|\"]`),
+	"SlackOAuth":    regexp.MustCompile(`(xox[p|b|o|a]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})`),
+	"HerokuOAuth":   regexp.MustCompile(`[h|H][e|E][r|R][o|O][k|K][u|U].*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}`),
+	"GenericToken":  regexp.MustCompile(`[s|S][e|E][c|C][r|R][e|E][t|T].*['|\"][0-9a-zA-Z]{32,45}['|\"]`),
+}
+
 // HashCalculator retuns the file information
 func (ar *AnalysisResult) HashCalculator(ipaFile string) {
 	fileBuf, err := ioutil.ReadFile(ipaFlag)
@@ -96,6 +111,8 @@ func (ar *AnalysisResult) HashCalculator(ipaFile string) {
 // https://github.com/aidansteele/osx-abi-macho-file-format-reference
 // https://github.com/hackrose/macho-go
 // https://mandalorian.com/2013/05/03/decrypting-ios-binaries/
+// TODO: Parse Mach-O Fat binary
+// TODO: Check if binary is encrypted
 func (ar *AnalysisResult) MachoAnalyzer() {
 	var err error
 	var machoObject *macho.File
@@ -229,8 +246,6 @@ func (ar *AnalysisResult) ParsePlist() {
 	ar.PlatformVersion = v.DTPlatformVersion
 	ar.MainOSVersion = v.MinimumOSVersion
 	ar.ATSec = v.NSAppTransportSecurity
-
-	// pp.Println(v)
 }
 
 // PathDiscover finds path disclosures
@@ -247,29 +262,13 @@ func (ar *AnalysisResult) PathDiscover() {
 
 // EggHunter searches for tokens, urls, usernames, passwords…
 // TODO: Search inside nib files
-// TODO: Set regexes on map and iterate
 func (ar *AnalysisResult) EggHunter() {
 	ar.WorthyEggs = map[string][]string{}
 
-	urlRegex := regexp.MustCompile(`(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?`)
-	ipAddrRegex := regexp.MustCompile(`^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$`)
-	googleAPIRegex := regexp.MustCompile(`\W(AIza.{35})`)
-	// emailRegexp := regexp.MustCompile(`[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}`)
-	emailRegexp := regexp.MustCompile(`[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})`)
-	awsRegexp := regexp.MustCompile(`AKIA[0-9A-Z]{16}`)
-	gitHubRegexp := regexp.MustCompile(`[g|G][i|I][t|T][h|H][u|U][b|B].*[['|\"]0-9a-zA-Z]{35,40}['|\"]`)
-	googleOAuthRegexp := regexp.MustCompile(`(\"client_secret\":\"[a-zA-Z0-9-_]{24}\")`)
-	twitterOAuthRegexp := regexp.MustCompile(`[t|T][w|W][i|I][t|T][t|T][e|E][r|R].*['|\"][0-9a-zA-Z]{35,44}['|\"]`)
-	facebookOAuthRegexp := regexp.MustCompile(`[f|F][a|A][c|C][e|E][b|B][o|O][o|O][k|K].*['|\"][0-9a-f]{32}['|\"]`)
-	slackOAuthRegexp := regexp.MustCompile(`(xox[p|b|o|a]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})`)
-	herokuRegexp := regexp.MustCompile(`[h|H][e|E][r|R][o|O][k|K][u|U].*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}`)
-	genericRegexp := regexp.MustCompile(`[s|S][e|E][c|C][r|R][e|E][t|T].*['|\"][0-9a-zA-Z]{32,45}['|\"]`)
-
 	// Extract URLs
 	for _, line := range ar.Strings {
-		if urlRegex.Match([]byte(line)) {
+		if eggs["URL"].Match([]byte(line)) {
 			ar.URLs = append(ar.URLs, line)
-			// log.Println(line)
 		}
 	}
 
@@ -285,28 +284,10 @@ func (ar *AnalysisResult) EggHunter() {
 			log.Error(err)
 		}
 
-		if googleAPIRegex.Match(buff) {
-			ar.WorthyEggs["GoogleAPI"] = append(ar.WorthyEggs["GoogleAPI"], file)
-		} else if ipAddrRegex.Match(buff) {
-			ar.WorthyEggs["IPAddress"] = append(ar.WorthyEggs["IPAddress"], file)
-		} else if emailRegexp.Match(buff) {
-			ar.WorthyEggs["EmailAddress"] = append(ar.WorthyEggs["EmailAddress"], file)
-		} else if awsRegexp.Match(buff) {
-			ar.WorthyEggs["AWS"] = append(ar.WorthyEggs["AWS"], file)
-		} else if gitHubRegexp.Match(buff) {
-			ar.WorthyEggs["GitHub"] = append(ar.WorthyEggs["GitHub"], file)
-		} else if googleOAuthRegexp.Match(buff) {
-			ar.WorthyEggs["GoogleOAuth"] = append(ar.WorthyEggs["GoogleOAuth"], file)
-		} else if twitterOAuthRegexp.Match(buff) {
-			ar.WorthyEggs["TwitterOAuth"] = append(ar.WorthyEggs["TwitterOAuth"], file)
-		} else if facebookOAuthRegexp.Match(buff) {
-			ar.WorthyEggs["FacebookOAuth"] = append(ar.WorthyEggs["FacebookOAuth"], file)
-		} else if slackOAuthRegexp.Match(buff) {
-			ar.WorthyEggs["SlackOAuth"] = append(ar.WorthyEggs["SlackOAuth"], file)
-		} else if herokuRegexp.Match(buff) {
-			ar.WorthyEggs["HerokuOAuth"] = append(ar.WorthyEggs["HerokuOAuth"], file)
-		} else if genericRegexp.Match(buff) {
-			ar.WorthyEggs["GenericToken"] = append(ar.WorthyEggs["GenericToken"], file)
+		for name, re := range eggs {
+			if re.Match(buff) {
+				ar.WorthyEggs[name] = append(ar.WorthyEggs[name], file)
+			}
 		}
 	}
 }
