@@ -19,14 +19,14 @@ The usage is easy, `ipanema -ipa my.ipa`, the analysis will output some useful i
 
 ## TODO
 
-[x] Basic analysis engine
-[x] CLI interface
-[x] Analysis output
-[x] Analysis project json dump
-[x] Search for valuable information available in the ipa bundle
-[ ] Automated analysis with recommendations
-[ ] Banned function analysis with an "exploitability" index
-[ ] Web GUI
-[ ] API
-[ ] Sandbox to do a dynamic analysis
-[ ] Function, methods and API fuzzing
+* [x] Basic analysis engine
+* [x] CLI interface
+* [x] Analysis output
+* [x] Analysis project json dump
+* [x] Search for valuable information available in the ipa bundle
+* [ ] Automated analysis with recommendations
+* [ ] Banned function analysis with an "exploitability" index
+* [ ] Web GUI
+* [ ] API
+* [ ] Sandbox to do a dynamic analysis
+* [ ] Function, methods and API fuzzing
