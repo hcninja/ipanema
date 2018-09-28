@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	// log "github.com/sirupsen/logrus"
 )
 
@@ -76,6 +78,17 @@ func Unzip(src string, dest string) ([]string, error) {
 	}
 
 	return filenames, nil
+}
+
+func FindAppContainer(files []string) string {
+	re := regexp.MustCompile("(?P<Container>/.*.app)")
+	for _, file := range files {
+		match := re.FindString(file)
+		if len(match) > 0 {
+			return strings.Replace(match, "/", "", -1)
+		}
+	}
+	return "unkown.app"
 }
 
 // PrettyPrinter prints the extracted info in a fancy way
