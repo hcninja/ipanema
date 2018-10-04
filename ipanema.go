@@ -27,12 +27,10 @@ import (
 	// https://godoc.org/github.com/DHowett/go-plist
 )
 
-const (
-	VERSION = "0.0.1"
-)
-
 var (
-	ipaFlag string
+	version   = "dev"
+	buildTime = ""
+	ipaFlag   string
 )
 
 var log = logrus.New()
@@ -51,11 +49,10 @@ func init() {
 
 	flag.StringVar(&ipaFlag, "ipa", "", "Select the ipa to analyze")
 	flag.Parse()
-
 }
 
 func main() {
-	log.Debugf("Starting ipanema v%s", VERSION)
+	log.Debugf("Starting ipanema v%s build (%s)", version, buildTime)
 
 	if ipaFlag == "" {
 		log.Error("Please, read the help info:")
