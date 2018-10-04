@@ -24,9 +24,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"os"
-	"path/filepath"
-	"strings"
 	// https://godoc.org/github.com/DHowett/go-plist
 )
 

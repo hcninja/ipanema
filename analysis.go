@@ -115,7 +115,7 @@ func (ar *AnalysisResult) HashCalculator(ipaFile string) {
 // TODO: Check if binary is encrypted
 func (ar *AnalysisResult) MachoAnalyzer() {
 	var err error
-	var machoObject *macho.File
+	// var machoObject *macho.File
 
 	// TODO: Parse Mach-O Fat binary
 	// machoFat, errFat := macho.OpenFat(filepath.Join(
@@ -126,63 +126,126 @@ func (ar *AnalysisResult) MachoAnalyzer() {
 	// 	machoObject = m.
 	// }
 
-	machoSlim, errSlim := macho.Open(filepath.Join(
+	machoSlim, err := macho.Open(filepath.Join(
 		ar.ProjDir, "Payload", ar.AppContainer, ar.ExecutableFile,
 	))
-	if errSlim == nil {
-		machoObject = machoSlim
-	}
+	if err == nil {
+		defer machoSlim.Close()
 
-	defer machoSlim.Close()
+		machoObject := machoSlim
 
-	ar.ImpLibs, err = machoObject.ImportedLibraries()
-	checkError(err)
+		ar.ImpLibs, err = machoObject.ImportedLibraries()
+		checkError(err)
 
-	ar.ImpSyms, err = machoObject.ImportedSymbols()
-	checkError(err)
+		ar.ImpSyms, err = machoObject.ImportedSymbols()
+		checkError(err)
 
-	// // TODO: Check if binary is encrypted
-	// pp.Println(machoObject.Symtab.Cmd)
-	// pp.Println(machoObject.Symtab.Cmd&LC_ENCRYPTION_INFO_64 == LC_ENCRYPTION_INFO_64)
-	// pp.Println(machoObject.Symtab.Cmd&LC_ENCRYPTION_INFO == LC_ENCRYPTION_INFO)
+		// // TODO: Check if binary is encrypted
+		// pp.Println(machoObject.Symtab.Cmd)
+		// pp.Println(machoObject.Symtab.Cmd&LC_ENCRYPTION_INFO_64 == LC_ENCRYPTION_INFO_64)
+		// pp.Println(machoObject.Symtab.Cmd&LC_ENCRYPTION_INFO == LC_ENCRYPTION_INFO)
 
-	for _, section := range machoObject.Sections {
-		if section.Name == "__cstring" { //|| section.Name == "__data" {
-			str, err := section.Data()
-			if err != nil {
-				log.Error("No available strings in '__cstring' section: %s", err.Error())
-			}
+		for _, section := range machoObject.Sections {
+			if section.Name == "__cstring" { //|| section.Name == "__data" {
+				str, err := section.Data()
+				if err != nil {
+					log.Error("No available strings in '__cstring' section: %s", err.Error())
+				}
 
-			bArr := bytes.Split(str, []byte{0x00})
-			for _, line := range bArr {
-				if len(line) > 1 {
-					store := true
+				bArr := bytes.Split(str, []byte{0x00})
+				for _, line := range bArr {
+					if len(line) > 1 {
+						store := true
 
-					for i := range line {
-						if !isPrintable(line[i]) {
-							store = false
+						for i := range line {
+							if !isPrintable(line[i]) {
+								store = false
+							}
 						}
-					}
 
-					if store {
-						strippedLine := strings.TrimSpace(string(line))
-						ar.Strings = append(ar.Strings, strippedLine)
+						if store {
+							strippedLine := strings.TrimSpace(string(line))
+							ar.Strings = append(ar.Strings, strippedLine)
+						}
 					}
 				}
 			}
 		}
+
+		syms := machoObject.Symtab
+		for _, s := range syms.Syms {
+			ar.SymTab = append(ar.SymTab, s.Name)
+		}
+
+		ar.AllowStackExecution = machoObject.Flags&macho.FlagAllowStackExecution == macho.FlagAllowStackExecution
+		ar.RootSafe = machoObject.Flags&macho.FlagRootSafe == macho.FlagRootSafe
+		ar.SetuidSafe = machoObject.Flags&macho.FlagSetuidSafe == macho.FlagSetuidSafe
+		ar.IsPIE = machoObject.Flags&macho.FlagPIE == macho.FlagPIE
+		ar.NoHeapExecution = machoObject.Flags&macho.FlagNoHeapExecution == macho.FlagNoHeapExecution
+
+		return
 	}
 
-	syms := machoObject.Symtab
-	for _, s := range syms.Syms {
-		ar.SymTab = append(ar.SymTab, s.Name)
-	}
+	machoFat, err := macho.OpenFat(filepath.Join(
+		ar.ProjDir, "Payload", ar.AppContainer, ar.ExecutableFile,
+	))
+	if err == nil {
+		defer machoFat.Close()
+		fatArches := machoFat.Arches
+		// for _, arch := range fatArches {
+		// 	log.Println(arch.Cpu.String())
+		// }
+		machoFObject := fatArches[0]
 
-	ar.AllowStackExecution = machoObject.Flags&macho.FlagAllowStackExecution == macho.FlagAllowStackExecution
-	ar.RootSafe = machoObject.Flags&macho.FlagRootSafe == macho.FlagRootSafe
-	ar.SetuidSafe = machoObject.Flags&macho.FlagSetuidSafe == macho.FlagSetuidSafe
-	ar.IsPIE = machoObject.Flags&macho.FlagPIE == macho.FlagPIE
-	ar.NoHeapExecution = machoObject.Flags&macho.FlagNoHeapExecution == macho.FlagNoHeapExecution
+		ar.ImpLibs, err = machoFObject.ImportedLibraries()
+		checkError(err)
+
+		ar.ImpSyms, err = machoFObject.ImportedSymbols()
+		checkError(err)
+
+		// // TODO: Check if binary is encrypted
+		// pp.Println(machoFObject.Symtab.Cmd)
+		// pp.Println(machoFObject.Symtab.Cmd&LC_ENCRYPTION_INFO_64 == LC_ENCRYPTION_INFO_64)
+		// pp.Println(machoFObject.Symtab.Cmd&LC_ENCRYPTION_INFO == LC_ENCRYPTION_INFO)
+
+		for _, section := range machoFObject.Sections {
+			if section.Name == "__cstring" { //|| section.Name == "__data" {
+				str, err := section.Data()
+				if err != nil {
+					log.Error("No available strings in '__cstring' section: %s", err.Error())
+				}
+
+				bArr := bytes.Split(str, []byte{0x00})
+				for _, line := range bArr {
+					if len(line) > 1 {
+						store := true
+
+						for i := range line {
+							if !isPrintable(line[i]) {
+								store = false
+							}
+						}
+
+						if store {
+							strippedLine := strings.TrimSpace(string(line))
+							ar.Strings = append(ar.Strings, strippedLine)
+						}
+					}
+				}
+			}
+		}
+
+		syms := machoFObject.Symtab
+		for _, s := range syms.Syms {
+			ar.SymTab = append(ar.SymTab, s.Name)
+		}
+
+		ar.AllowStackExecution = machoFObject.Flags&macho.FlagAllowStackExecution == macho.FlagAllowStackExecution
+		ar.RootSafe = machoFObject.Flags&macho.FlagRootSafe == macho.FlagRootSafe
+		ar.SetuidSafe = machoFObject.Flags&macho.FlagSetuidSafe == macho.FlagSetuidSafe
+		ar.IsPIE = machoFObject.Flags&macho.FlagPIE == macho.FlagPIE
+		ar.NoHeapExecution = machoFObject.Flags&macho.FlagNoHeapExecution == macho.FlagNoHeapExecution
+	}
 }
 
 // GetInterestingFiles populates the struct with important files
