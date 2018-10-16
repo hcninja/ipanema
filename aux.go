@@ -118,8 +118,14 @@ func PrettyPrinter(ar *AnalysisResult) {
 	log.Infof("[Platform version] %s", ar.PlatformVersion)
 	log.Infof("[Main OS version] %s", ar.MainOSVersion)
 	log.Info("[App Transport Security]")
-	for k, v := range ar.ATSec {
-		fmt.Printf("\t\t %s: %t\n", k, v)
+	// for k, v := range ar.ATSec {
+	// 	fmt.Printf("\t\t %s: %t\n", k, v)
+	// }
+	j, err := json.MarshalIndent(ar.ATSec, "", "  ")
+	if err != nil {
+		log.Error(err)
+	} else {
+		fmt.Println(string(j))
 	}
 	log.Infof("[Allow Stack Execution flag] %t", ar.AllowStackExecution)
 	log.Infof("[Root Safe flag] %t", ar.RootSafe)

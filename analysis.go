@@ -67,7 +67,7 @@ type AnalysisResult struct {
 	ImpSyms             []string            // Imported symbols
 	SymTab              []string            // Symbols table
 	Strings             []string            // Binary strings
-	ATSec               map[string]bool     // NSAppTransportSecurity constrains
+	ATSec               interface{}         // NSAppTransportSecurity constrains
 	AllowStackExecution bool                // Allows stack code execution
 	RootSafe            bool                // Root safe execution flag
 	SetuidSafe          bool                // SetuidSafe flag
@@ -293,7 +293,7 @@ func (ar *AnalysisResult) ParsePlist() {
 		// communication with particular servers or allow insecure loads for web
 		// views or for media, while maintaining ATS protections elsewhere in
 		// your app.
-		NSAppTransportSecurity map[string]bool `plist:"NSAppTransportSecurity"`
+		NSAppTransportSecurity interface{} `plist:"NSAppTransportSecurity"`
 	}
 
 	infPlistBuf, err := ioutil.ReadFile(filepath.Join(ar.ProjDir, infPlist))
