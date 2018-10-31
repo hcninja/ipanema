@@ -116,7 +116,7 @@ func PrettyPrinter(ar *AnalysisResult) {
 	log.Infof("[Bundle name] %s", ar.BundleName)
 	log.Infof("[SDK name] %s", ar.SDKName)
 	log.Infof("[Platform version] %s", ar.PlatformVersion)
-	log.Infof("[Main OS version] %s", ar.MainOSVersion)
+	log.Infof("[Min OS version] %s", ar.MinOSVersion)
 	log.Info("[App Transport Security]")
 	// for k, v := range ar.ATSec {
 	// 	fmt.Printf("\t\t %s: %t\n", k, v)

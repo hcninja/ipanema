@@ -57,7 +57,7 @@ type AnalysisResult struct {
 	SDKName         string // iOS SDK name
 	Version         string // Application version
 	PlatformVersion string // iOS version
-	MainOSVersion   string // iOS min version
+	MinOSVersion    string // iOS min version
 	ExecutableFile  string // The executable binary (Mach-o or fatMach-o)
 
 	// Processed data
@@ -307,7 +307,7 @@ func (ar *AnalysisResult) ParsePlist() {
 	ar.SDKName = v.DTSDKName
 	ar.Version = v.CFBundleVersion
 	ar.PlatformVersion = v.DTPlatformVersion
-	ar.MainOSVersion = v.MinimumOSVersion
+	ar.MinOSVersion = v.MinimumOSVersion
 	ar.ATSec = v.NSAppTransportSecurity
 }
 
