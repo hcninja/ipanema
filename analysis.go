@@ -79,11 +79,11 @@ type AnalysisResult struct {
 }
 
 var eggs = map[string]*regexp.Regexp{
+	// Generic usefull data
 	"URL":           regexp.MustCompile(`(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?`),
 	"IPAddress":     regexp.MustCompile(`^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$`),
 	"GoogleAPI":     regexp.MustCompile(`\W(AIza.{35})`),
 	"EmailAddress":  regexp.MustCompile(`[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})`),
-	"AWS":           regexp.MustCompile(`AKIA[0-9A-Z]{16}`),
 	"GitHub":        regexp.MustCompile(`[g|G][i|I][t|T][h|H][u|U][b|B].*[['|\"]0-9a-zA-Z]{35,40}['|\"]`),
 	"GoogleOAuth":   regexp.MustCompile(`(\"client_secret\":\"[a-zA-Z0-9-_]{24}\")`),
 	"TwitterOAuth":  regexp.MustCompile(`[t|T][w|W][i|I][t|T][t|T][e|E][r|R].*['|\"][0-9a-zA-Z]{35,44}['|\"]`),
@@ -91,6 +91,17 @@ var eggs = map[string]*regexp.Regexp{
 	"SlackOAuth":    regexp.MustCompile(`(xox[p|b|o|a]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})`),
 	"HerokuOAuth":   regexp.MustCompile(`[h|H][e|E][r|R][o|O][k|K][u|U].*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}`),
 	"GenericToken":  regexp.MustCompile(`[s|S][e|E][c|C][r|R][e|E][t|T].*['|\"][0-9a-zA-Z]{32,45}['|\"]`),
+	// AWS Keys
+	"AWSAccessToken":        regexp.MustCompile(`AKIA[0-9A-Z]{16}`),
+	"AWSContentCredentials": regexp.MustCompile(`ACCA[0-9A-Z]{16}`),
+	"AWSGroup":              regexp.MustCompile(`AGPA[0-9A-Z]{16}`),
+	"AWSIAMUser":            regexp.MustCompile(`AIDA[0-9A-Z]{16}`),
+	"AWSEC2Instance":        regexp.MustCompile(`AIPA[0-9A-Z]{16}`),
+	"AWSManagedPolicy":      regexp.MustCompile(`ANVA[0-9A-Z]{16}`),
+	"AWSPublicKey":          regexp.MustCompile(`APKA[0-9A-Z]{16}`),
+	"AWSRole":               regexp.MustCompile(`AROA[0-9A-Z]{16}`),
+	"AWSCertficate":         regexp.MustCompile(`ASCA[0-9A-Z]{16}`),
+	"AWSTemporary":          regexp.MustCompile(`ASIA[0-9A-Z]{16}`),
 }
 
 // HashCalculator retuns the file information
