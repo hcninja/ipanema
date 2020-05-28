@@ -6,7 +6,7 @@ BUILD_TIME=`date +%FT%T%z`
 LDFLAGS=-ldflags="\
 	-s \
 	-w \
-	-X main.version=${VERSION}"
+	-X main.version=${VERSION} \
 	-X main.buildTime=${BUILD_TIME}"
 
 
@@ -25,8 +25,8 @@ $(TARGET):
 
 .PHONY: macos
 macos:
-	GOOS=darwin GOARCH=amd64 go build ${LDFLAGS} -o ${BINARY}_darwin
-	mv ${BINARY} ${GOBIN}
+	GOOS=darwin GOARCH=amd64 go build ${LDFLAGS} -o ${BINARY}
+	mv ${BINARY} ${GOBIN}/
 
 .PHONY: clean
 clean:
