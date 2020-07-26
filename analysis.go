@@ -34,8 +34,10 @@ import (
 )
 
 const (
+	// LC_ENCRYPTION_INFO_64 encrypted ARM64 ipa flag
 	LC_ENCRYPTION_INFO_64 = 0x2c
-	LC_ENCRYPTION_INFO    = 0x21
+	// LC_ENCRYPTION_INFO encrypted ARM ipa flag
+	LC_ENCRYPTION_INFO = 0x21
 )
 
 // AnalysisResult holds all the information relative to the analysis
@@ -76,14 +78,15 @@ type AnalysisResult struct {
 	DisclosedPaths      []string            // Disclosed paths
 	URLs                []string            // Binary available strings
 	WorthyEggs          map[string][]string // Saves file name and its interesting info
+	Tokens              map[string][]string // Saves the tokens
 }
 
 var eggs = map[string]*regexp.Regexp{
 	// Generic usefull data
 	"URL":           regexp.MustCompile(`(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?`),
+	"EmailAddress":  regexp.MustCompile(`[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})`),
 	"IPAddress":     regexp.MustCompile(`^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$`),
 	"GoogleAPI":     regexp.MustCompile(`\W(AIza.{35})`),
-	"EmailAddress":  regexp.MustCompile(`[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})`),
 	"GitHub":        regexp.MustCompile(`[g|G][i|I][t|T][h|H][u|U][b|B].*[['|\"]0-9a-zA-Z]{35,40}['|\"]`),
 	"GoogleOAuth":   regexp.MustCompile(`(\"client_secret\":\"[a-zA-Z0-9-_]{24}\")`),
 	"TwitterOAuth":  regexp.MustCompile(`[t|T][w|W][i|I][t|T][t|T][e|E][r|R].*['|\"][0-9a-zA-Z]{35,44}['|\"]`),
@@ -92,16 +95,16 @@ var eggs = map[string]*regexp.Regexp{
 	"HerokuOAuth":   regexp.MustCompile(`[h|H][e|E][r|R][o|O][k|K][u|U].*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}`),
 	"GenericToken":  regexp.MustCompile(`[s|S][e|E][c|C][r|R][e|E][t|T].*['|\"][0-9a-zA-Z]{32,45}['|\"]`),
 	// AWS Keys
-	"AWSAccessToken":        regexp.MustCompile(`AKIA[0-9A-Z]{16}`),
-	"AWSContentCredentials": regexp.MustCompile(`ACCA[0-9A-Z]{16}`),
-	"AWSGroup":              regexp.MustCompile(`AGPA[0-9A-Z]{16}`),
-	"AWSIAMUser":            regexp.MustCompile(`AIDA[0-9A-Z]{16}`),
-	"AWSEC2Instance":        regexp.MustCompile(`AIPA[0-9A-Z]{16}`),
-	"AWSManagedPolicy":      regexp.MustCompile(`ANVA[0-9A-Z]{16}`),
-	"AWSPublicKey":          regexp.MustCompile(`APKA[0-9A-Z]{16}`),
-	"AWSRole":               regexp.MustCompile(`AROA[0-9A-Z]{16}`),
-	"AWSCertficate":         regexp.MustCompile(`ASCA[0-9A-Z]{16}`),
-	"AWSTemporary":          regexp.MustCompile(`ASIA[0-9A-Z]{16}`),
+	"AWSAccessToken": regexp.MustCompile(`(?i)AKIA[0-9A-Z]{16}`),
+	// "AWSContentCredentials": regexp.MustCompile(`(?i)ACCA[0-9A-Z]{16}`),
+	// "AWSGroup":              regexp.MustCompile(`(?i)AGPA[0-9A-Z]{16}`),
+	// "AWSIAMUser":            regexp.MustCompile(`(?i)AIDA[0-9A-Z]{16}`),
+	// "AWSEC2Instance":        regexp.MustCompile(`(?i)AIPA[0-9A-Z]{16}`),
+	// "AWSManagedPolicy":      regexp.MustCompile(`(?i)ANVA[0-9A-Z]{16}`),
+	// "AWSPublicKey":          regexp.MustCompile(`(?i)APKA[0-9A-Z]{16}`),
+	// "AWSRole":               regexp.MustCompile(`(?i)AROA[0-9A-Z]{16}`),
+	// "AWSCertficate":         regexp.MustCompile(`(?i)ASCA[0-9A-Z]{16}`),
+	// "AWSTemporary":          regexp.MustCompile(`(?i)ASIA[0-9A-Z]{16}`),
 }
 
 // HashCalculator retuns the file information
@@ -360,6 +363,12 @@ func (ar *AnalysisResult) EggHunter() {
 
 		for name, re := range eggs {
 			if re.Match(buff) {
+				// match := re.FindStringSubmatch(string(buff))
+				// if name != "URL" && name != "EmailAddress" {
+				// 	// if strings.Contains(name, "AWS") {
+				// 	pp.Println(match[0])
+				// }
+
 				ar.WorthyEggs[name] = append(ar.WorthyEggs[name], file)
 			}
 		}

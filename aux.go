@@ -80,6 +80,7 @@ func Unzip(src string, dest string) ([]string, error) {
 	return filenames, nil
 }
 
+// FindAppContainer locates the app container inside the ipa bundle
 func FindAppContainer(files []string) string {
 	re := regexp.MustCompile("(?P<Container>/.*.app)")
 	for _, file := range files {
@@ -139,6 +140,8 @@ func PrettyPrinter(ar *AnalysisResult) {
 			fmt.Printf("\t\t\t %s\n", element)
 		}
 	}
+
+	// pp.Println(ar.WorthyEggs)
 }
 
 // FileDump prints the extracted info in a fancy way
@@ -180,9 +183,8 @@ func FileDump(ar *AnalysisResult) {
 }
 
 // SecurityAnalysis evaluates some risky issues and explains why
-func SecurityAnalysis(ar *AnalysisResult) {
-
-}
+// TODO: Implement functionality
+func SecurityAnalysis(ar *AnalysisResult) {}
 
 // ===========
 // = Helpers =
