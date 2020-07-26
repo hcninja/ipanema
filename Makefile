@@ -14,14 +14,12 @@ LDFLAGS=-ldflags="\
 
 .PHONY: all
 $(TARGET):
-	mkdir deploy
-	GOOS=windows GOARCH=amd64 go build ${LDFLAGS} -o build/${BINARY}.exe
-	GOOS=darwin GOARCH=amd64 go build ${LDFLAGS} -o build/${BINARY}_darwin
-	GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -o build/${BINARY}_linux
-	cd deploy
+	GOOS=windows GOARCH=amd64 go build ${LDFLAGS} -o ${BINARY}.exe
+	GOOS=darwin GOARCH=amd64 go build ${LDFLAGS} -o ${BINARY}_darwin
+	GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -o ${BINARY}_linux
 	tar czvf ${BINARY}_darwin.tgz ${BINARY}_darwin
 	tar czvf ${BINARY}_linux.tgz ${BINARY}_linux
-	zip -9 ipanema_windows.zip ipanema.exe
+	zip -9 ${BINARY}_windows.zip ${BINARY}.exe
 
 .PHONY: macos
 macos:
@@ -30,4 +28,4 @@ macos:
 
 .PHONY: clean
 clean:
-	rm -rf build
+	rm -rf ${BINARY}.exe ${BINARY}_darwin ${BINARY}_linux ${BINARY}_darwin.tgz ${BINARY}_linux.tgz ${BINARY}_windows.zip
