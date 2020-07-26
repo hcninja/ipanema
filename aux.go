@@ -133,15 +133,20 @@ func PrettyPrinter(ar *AnalysisResult) {
 	log.Infof("[SetUID safe flag] %t", ar.SetuidSafe)
 	log.Infof("[Is PIE compiled] %t", ar.IsPIE)
 	log.Infof("[No Heap execution] %t", ar.NoHeapExecution)
-	log.Info("[Files with interesting data]")
+	log.Info("[Interesting API Tokens]")
+	for k, v := range ar.Tokens {
+		fmt.Printf("\t\t %s:\n", k)
+		for _, element := range v {
+			fmt.Printf("\t\t\t %s\n", element)
+		}
+	}
+	log.Info("[Files with other interesting data]")
 	for k, v := range ar.WorthyEggs {
 		fmt.Printf("\t\t %s:\n", k)
 		for _, element := range v {
 			fmt.Printf("\t\t\t %s\n", element)
 		}
 	}
-
-	// pp.Println(ar.WorthyEggs)
 }
 
 // FileDump prints the extracted info in a fancy way

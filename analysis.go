@@ -341,6 +341,7 @@ func (ar *AnalysisResult) PathDiscover() {
 // TODO: Search inside nib files
 func (ar *AnalysisResult) EggHunter() {
 	ar.WorthyEggs = map[string][]string{}
+	ar.Tokens = map[string][]string{}
 
 	// Extract URLs
 	for _, line := range ar.Strings {
@@ -363,11 +364,12 @@ func (ar *AnalysisResult) EggHunter() {
 
 		for name, re := range eggs {
 			if re.Match(buff) {
-				// match := re.FindStringSubmatch(string(buff))
+				match := re.FindStringSubmatch(string(buff))
 				// if name != "URL" && name != "EmailAddress" {
-				// 	// if strings.Contains(name, "AWS") {
-				// 	pp.Println(match[0])
-				// }
+				if name == "GoogleAPI" || name == "AWSAccessToken" {
+					// pp.Println(match[0])
+					ar.Tokens[name] = append(ar.Tokens[name], match[0])
+				}
 
 				ar.WorthyEggs[name] = append(ar.WorthyEggs[name], file)
 			}
