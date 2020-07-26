@@ -8,8 +8,8 @@ The easiest way is to download a precompiled binary for your architecture and op
 
 If you want to build it by yourself follow this steps:
 
-* `go get dev.hackercat.ninja/hcninja/ipanema`
-* `go install dev.hackercat.ninja/hcninja/ipanema`
+* `go get github.com/hcninja/ipanema`
+* `go install github.com/hcninja/ipanema`
 
 If this doesn't work, go to the project folder and do a `go get -u` before `go install`.
 
