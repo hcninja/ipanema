@@ -29,5 +29,7 @@ The usage is easy, `ipanema -ipa my.ipa`, the analysis will output some useful i
 * [ ] Banned function analysis with an "exploitability" index
 * [ ] API
 * [ ] Web GUI
+
+## Future maybes
 * [ ] Sandbox to do a dynamic analysis
 * [ ] Function, methods and API fuzzing
