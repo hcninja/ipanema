@@ -24,6 +24,7 @@ The usage is easy, `ipanema -ipa my.ipa`, the analysis will output some useful i
 * [x] Analysis output
 * [x] Analysis project json dump
 * [x] Search for valuable information available in the ipa bundle
+* [ ] Detect correctly if the provided ipa is encrypted
 * [ ] Automated analysis with recommendations
 * [ ] Banned function analysis with an "exploitability" index
 * [ ] API
